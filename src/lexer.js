@@ -8,7 +8,7 @@ let log = require('./utils')
 let token = {
     startTag: 'startTag',
     endTag: 'endTag',
-    propMap: 'propMap',
+    text: 'text',
     eof: 'eof'
 }
 
@@ -22,17 +22,18 @@ class Lexer {
     advance() {
         let str = this.string[this.pos]
         this.pos++
-        log('advance', str)
+        // log('advance', str)
         return str
     }
 
     lookAhead() {
         let str = this.string[this.pos]
-        log('lookahead', str)
+        // log('lookahead', str)
         return str
     }
 
     lex() {
+        let text = ''
         while (true) {
             let t = this.advance()
             switch (t) {
@@ -42,11 +43,15 @@ class Lexer {
                     } else {
                         return this.handleStartTag()
                     }
-                case ' ':
+                case '\n':
                     break
                 case undefined:
                     return this.token['eof']
                 default:
+                    text += t
+                    if (this.lookAhead() == '<') {
+                        return [this.token['text'], text]
+                    }
                     break
             }
             this.string = this.string.slice(this.pos)
@@ -55,10 +60,13 @@ class Lexer {
     }
 
     handleStartTag() {
-        let s = this.string.split(' ')[0]
+        let s = this.string.split(' ').filter((str) => {
+            return str != ''
+        })[0]
         let type = s.slice(1)
-        this.pos += 3
+        this.pos += type.length
         let props = this.handlePropTag()
+        this.advance()
         return [token.startTag, type, props]
     }
 
@@ -66,7 +74,8 @@ class Lexer {
         this.advance()
         let idx = this.string.indexOf('>')
         let type = this.string.slice(this.pos, idx)
-        this.pos += 3
+        log('end tag', this.string, this.pos, idx, type)
+        this.pos += type.length
         if (this.advance() != '>') {
             throw 'parse err! miss match '>''
         }
@@ -74,15 +83,10 @@ class Lexer {
     }
 
     handlePropTag() {
-        // let idx = this.string.indexOf(' ')
-        // idx = idx == -1 ? this.string.indexOf('>') : idx
-        // let value = this.string.slice(this.pos + 1, idx - 1)
-        // log('value', value, this.pos, idx)
-        // return [this.token['propMap'], key, value]
         this.advance()
         let idx = this.string.indexOf('>')
         if (idx == -1) {
-            throw 'parse err'
+            throw 'parse err! miss match '>''
         }
         let string = this.string.slice(this.pos, idx)
         let props = string.split(' ')
@@ -94,15 +98,21 @@ class Lexer {
             o[kv[0]] = kv[1]
             return o
         })
-        log('pm', pm)
+        log('po ', this.pos)
         this.pos += string.length
+        log('poa ', this.pos)
         return pm
     }
 }
 
 function main() {
-    let str = `<div name="{{ad}}"    class="fuck" id="1"></div>`
+    let str = `<div name="{{ad}}"    class="fuck" id="1">
+                    this is text
+                    <span name="asd"></span>
+                </div>`
     let lexer = new Lexer(str)
+    log('lex', lexer.lex())
+    log('lex', lexer.lex())
     log('lex', lexer.lex())
     log('lex', lexer.lex())
     log('lex', lexer.lex())
@@ -110,4 +120,4 @@ function main() {
 
 main()
 
-module.exports = token
+module.exports = Lexer
