@@ -33,7 +33,6 @@ class Lexer {
     }
 
     lex() {
-        let key = ''
         while (true) {
             let t = this.advance()
             switch (t) {
@@ -44,17 +43,10 @@ class Lexer {
                         return this.handleStartTag()
                     }
                 case ' ':
-                    key = ''
                     break
-                case '=':
-                    let token = this.handlePropTag(key)
-                    log('key', key)
-                    key = ''
-                    return token
                 case undefined:
                     return this.token['eof']
                 default:
-                    key += t
                     break
             }
             this.string = this.string.slice(this.pos)
@@ -65,8 +57,9 @@ class Lexer {
     handleStartTag() {
         let s = this.string.split(' ')[0]
         let type = s.slice(1)
-        
-        return [token.startTag, type]
+        this.pos += 3
+        let props = this.handlePropTag()
+        return [token.startTag, type, props]
     }
 
     handleEndTag() {
@@ -75,22 +68,40 @@ class Lexer {
         let type = this.string.slice(this.pos, idx)
         this.pos += 3
         if (this.advance() != '>') {
-            throw 'parse err'
+            throw 'parse err! miss match '>''
         }
         return [token.endTag, type]
     }
 
-    handlePropTag(key) {
-        let idx = this.string.indexOf(' ')
-        idx = idx == -1 ? this.string.indexOf('>') : idx
-        let value = this.string.slice(this.pos, idx)
-        log('value', value, this.pos, idx)
-        return [this.token['propMap'], key, value]
+    handlePropTag() {
+        // let idx = this.string.indexOf(' ')
+        // idx = idx == -1 ? this.string.indexOf('>') : idx
+        // let value = this.string.slice(this.pos + 1, idx - 1)
+        // log('value', value, this.pos, idx)
+        // return [this.token['propMap'], key, value]
+        this.advance()
+        let idx = this.string.indexOf('>')
+        if (idx == -1) {
+            throw 'parse err'
+        }
+        let string = this.string.slice(this.pos, idx)
+        let props = string.split(' ')
+        let pm = props.filter((props) => {
+            return props != ''
+        }).map((prop) => {
+            let kv = prop.split('=')
+            let o = {}
+            o[kv[0]] = kv[1]
+            return o
+        })
+        log('pm', pm)
+        this.pos += string.length
+        return pm
     }
 }
 
 function main() {
-    let str = `<div name='ad'></div>`
+    let str = `<div name="{{ad}}"    class="fuck" id="1"></div>`
     let lexer = new Lexer(str)
     log('lex', lexer.lex())
     log('lex', lexer.lex())
