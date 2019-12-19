@@ -8,8 +8,7 @@ let log = require('./utils')
 let token = {
     startTag: 'startTag',
     endTag: 'endTag',
-    propKey: 'propKey',
-    propVal: 'propVal',
+    propMap: 'propMap',
     eof: 'eof'
 }
 
@@ -34,9 +33,9 @@ class Lexer {
     }
 
     lex() {
+        let key = ''
         while (true) {
             let t = this.advance()
-            let key = ''
             switch (t) {
                 case '<':
                     if (this.lookAhead() === '/') {
@@ -45,14 +44,21 @@ class Lexer {
                         return this.handleStartTag()
                     }
                 case ' ':
+                    key = ''
                     break
                 case '=':
-                    return this.handlePropTag()
+                    let token = this.handlePropTag(key)
+                    log('key', key)
+                    key = ''
+                    return token
                 case undefined:
                     return this.token['eof']
                 default:
                     key += t
+                    break
             }
+            this.string = this.string.slice(this.pos)
+            this.pos = 0
         }
     }
 
@@ -74,15 +80,21 @@ class Lexer {
         return [token.endTag, type]
     }
 
-    handlePropTag() {
-        
+    handlePropTag(key) {
+        let idx = this.string.indexOf(' ')
+        idx = idx == -1 ? this.string.indexOf('>') : idx
+        let value = this.string.slice(this.pos, idx)
+        log('value', value, this.pos, idx)
+        return [this.token['propMap'], key, value]
     }
 }
 
 function main() {
-    let str = `</div>`
+    let str = `<div name='ad'></div>`
     let lexer = new Lexer(str)
-    log(lexer.lex())
+    log('lex', lexer.lex())
+    log('lex', lexer.lex())
+    log('lex', lexer.lex())
 }
 
 main()
