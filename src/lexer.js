@@ -111,7 +111,7 @@ class Lexer {
             }).map((prop) => {
                 let kv = prop.split('=')
                 let o = {}
-                o[kv[0]] = kv[1]
+                o[kv[0]] = this.trimQuotes(kv[1])
                 return o
             })
             this.pos += string.length
@@ -126,6 +126,17 @@ class Lexer {
         } else {
             return ''
         }
+    }
+
+    trimQuotes(string) {
+        let last = string.length - 1
+        let dq = string[0] == '"' && string[last] == '"'
+        let iq = string[0] == '\'' && string[last] == '\''
+        if (dq || iq) {
+            return string.slice(1, last)
+        }
+
+        throw 'parse error! quotes miss matchs'
     }
 }
 

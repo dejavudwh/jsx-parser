@@ -43,7 +43,9 @@ class JsxParser {
             this.parseMap['error']()
         }
 
-        log('tags', this.tags)
+        if (this.tags.length > 0) {
+            throw 'parse error! Mismatched start and end tags'
+        }
     }
 
     parseStart(tag, props) {
@@ -128,7 +130,7 @@ let str = `<div name="{{ad}}"    class="fuck" id="1">
                     <Counter>
                     </Counter>
                 </div>  
-            </div>  
+            </div>
             `
 
 let jp = new JsxParser(str)
