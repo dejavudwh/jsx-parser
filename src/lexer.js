@@ -48,7 +48,7 @@ class Lexer {
                     }
                 case undefined:
                     if (this.pos >= this.string.length) {
-                        token = this.token['eof']
+                        token = [this.token['eof'], 'eof']
                     }
                     break
                 default:
