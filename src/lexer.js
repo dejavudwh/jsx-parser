@@ -130,12 +130,18 @@ class Lexer {
 }
 
 function main() {
-    let str = `<div name="{{ad}}"    class="fuck" id="1">
-                    this is text
-                    <span name="asd">
-                        <p>fu ck</p>
-                    </span>
-                </div>`
+let str = `<div name="{{ad}}"    class="fuck" id="1">
+                this is text
+                <span name="asd">
+                    <p>fu ck</p>
+                </span> 
+                <div>
+                    <span name="zxc">
+                        <p>thi nk</p>
+                    </span> 
+                </div>  
+            </div>  
+                `
     let lexer = new Lexer(str)
     log('lex', lexer.lex())
     log('lex', lexer.lex())
@@ -145,8 +151,16 @@ function main() {
     log('lex', lexer.lex())
     log('lex', lexer.lex())
     log('lex', lexer.lex())
+    log('lex', lexer.lex())
+
+    log('lex', lexer.lex())
+
+    log('lex', lexer.lex())
+
+    log('lex', lexer.lex())
+
 }
 
-// main()
+main()
 
 module.exports = Lexer

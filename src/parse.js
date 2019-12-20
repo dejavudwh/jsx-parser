@@ -79,7 +79,7 @@ class JsxParser {
     }
 
     parseText(tag) {
-        this.jsx['props']['test'] = tag
+        this.jsx['props']['text'] = tag
         this.parse()
     }
 
@@ -93,9 +93,9 @@ class JsxParser {
 
     test() {
         let jsx = this.jsx
-        jsx = jsx.props['children']=  new Jsx('asd', {})
         jsx = jsx.props['children'] = new Jsx('asd', {})
-        jsx = jsx.props['children'] =  new Jsx('asd', {})
+        jsx = jsx.props['children'] = new Jsx('asd', {})
+        jsx = jsx.props['children'] = new Jsx('asd', {})
         log(this.jsx)
     }
 }
@@ -106,13 +106,17 @@ let str = `<div name="{{ad}}"    class="fuck" id="1">
                     <p>fu ck</p>
                 </span> 
                 <div>
-                    zxc
+                    <span name="zxc">
+                        <p>thi nk</p>
+                    </span> 
+                    <Counter>
+                    </Counter>
                 </div>  
             </div>  
             `
 
 let jp = new JsxParser(str)
 jp.parse()
-log(JSON.stringify(jp.jsx))
+log(JSON.stringify(jp.jsx, null, 2))
 // new JsxParser(str).test()
 
