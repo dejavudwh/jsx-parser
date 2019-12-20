@@ -36,26 +36,28 @@ class Lexer {
         let text = ''
         while (true) {
             let t = this.advance()
+            let token = ''
             switch (t) {
                 case '<':
                     if (this.lookAhead() === '/') {
-                        return this.handleEndTag()
+                        token = this.handleEndTag()
                     } else {
-                        return this.handleStartTag()
+                        token = this.handleStartTag()
                     }
                 case '\n':
                     break
                 case undefined:
-                    return this.token['eof']
+                    token = this.token['eof']
                 default:
                     text += t
-                    if (this.lookAhead() == '<') {
-                        return [this.token['text'], text]
-                    }
+                    token = this.handleTextTag(text)
                     break
             }
             this.string = this.string.slice(this.pos)
             this.pos = 0
+            if (token != '') {
+                return token
+            }
         }
     }
 
@@ -102,6 +104,14 @@ class Lexer {
         this.pos += string.length
         log('poa ', this.pos)
         return pm
+    }
+
+    handleTextTag(text) {
+        if (this.lookAhead() == '<') {
+            return [this.token['text'], text]
+        } else {
+            return ''
+        }
     }
 }
 
