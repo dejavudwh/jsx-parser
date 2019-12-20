@@ -31,6 +31,7 @@ class JsxParser {
 
     parse() {
         this.currentToken = this.lexer.lex()
+        log('token ', this.currentToken)
         let type = this.currentToken[0]
         let tag = this.currentToken[1]
         let props = this.mergeObj(this.currentToken[2])
@@ -65,7 +66,7 @@ class JsxParser {
             Object.assign(this.currentJsx['props'], props)
             jsx.push(this.currentJsx)
         } else {
-            jsx = new Jsx(tag, {
+            this.currentJsx = jsx = new Jsx(tag, {
                 'childrens': []
             })
             Object.assign(jsx['props'], props)
@@ -83,6 +84,7 @@ class JsxParser {
     }
 
     parseText(tag) {
+        log('text', this.currentJsx, this.jsx)
         this.currentJsx['props']['text'] = tag
         this.parse()
     }

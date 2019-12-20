@@ -22,6 +22,11 @@ class Lexer {
 
     lookAhead() {
         let str = this.string[this.pos]
+        let p = this.pos
+        while (str == ' ' || str == '\n') {
+            p++
+            str = this.string[p]
+        }
         return str
     }
 
@@ -121,8 +126,10 @@ class Lexer {
     }
 
     handleTextTag(text) {
+        let t = text.trim()
+        log('lexer', text, this.lookAhead())
         if (this.lookAhead() == '<') {
-            return [this.token['text'], text.trim(), []]
+            return [this.token['text'], t, []]
         } else {
             return ''
         }
@@ -136,7 +143,7 @@ class Lexer {
             return string.slice(1, last)
         }
 
-        throw 'parse error! quotes miss matchs'
+        throw `parse error! ${string} quotes miss matchs`
     }
 }
 
