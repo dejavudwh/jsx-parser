@@ -33,7 +33,8 @@ class JsxParser {
         this.currentToken = this.lexer.lex()
         let type = this.currentToken[0]
         let tag = this.currentToken[1]
-        let props = this.currentToken[2]
+        log('parse', this.currentToken[2])
+        let props = this.mergeObj(this.currentToken[2])
         log('current token ', this.currentToken)
         let func = this.parseMap[type]
         if (func != undefined) {
@@ -61,11 +62,13 @@ class JsxParser {
             this.currentJsx = new Jsx(tag, {
                 'childrens': []
             })
+            Object.assign(this.currentJsx['props'], props)
             jsx.push(this.currentJsx)
         } else {
             jsx = new Jsx(tag, {
                 'childrens': []
             })
+            Object.assign(jsx['props'], props)
             this.jsx = jsx
         }
         log('start ', this.jsx)
@@ -92,6 +95,16 @@ class JsxParser {
 
     parseErr() {
         throw `parse err! syntax err `
+    }
+
+    mergeObj(objs) {
+        log('bij', objs)
+        let o = {}
+        for (let i = 0; i < objs.length; i++) {
+            Object.assign(o, objs[i])
+        }
+
+        return o
     }
 
     test() {

@@ -48,7 +48,7 @@ class Lexer {
                     }
                 case undefined:
                     if (this.pos >= this.string.length) {
-                        token = [this.token['eof'], 'eof']
+                        token = [this.token['eof'], 'eof', []]
                     }
                     break
                 default:
@@ -93,7 +93,7 @@ class Lexer {
         if (this.advance() != '>') {
             throw 'parse err! miss match '>''
         }
-        return [token.endTag, type]
+        return [token.endTag, type, []]
     }
 
     handlePropTag() {
@@ -122,7 +122,7 @@ class Lexer {
 
     handleTextTag(text) {
         if (this.lookAhead() == '<') {
-            return [this.token['text'], text.trim()]
+            return [this.token['text'], text.trim(), []]
         } else {
             return ''
         }
