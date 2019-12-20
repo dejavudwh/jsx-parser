@@ -22,7 +22,7 @@ let str = `<div name="{{jsx-parse}}" class="{{fuck}}" id="1">
                 </span> 
                 <div>
                     <span name="live" do="{{gofuck}}">
-                        <p>Looking away, everything is sad                        </p>
+                        <p>Looking away, everything is sad</p>
                     </span> 
                     <Counter me="excellent">
                         I am awesome
