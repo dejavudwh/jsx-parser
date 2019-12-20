@@ -1,8 +1,3 @@
-// <div name='mydiv'>
-//     <span id='myspan'>
-//         <p>text</p>
-//     </span>
-// </div>  
 let log = require('./utils')
 
 let token = {
@@ -22,13 +17,11 @@ class Lexer {
     advance() {
         let str = this.string[this.pos]
         this.pos++
-        // log('advance', str)
         return str
     }
 
     lookAhead() {
         let str = this.string[this.pos]
-        // log('lookahead', str)
         return str
     }
 
@@ -44,10 +37,20 @@ class Lexer {
                     } else {
                         token = this.handleStartTag()
                     }
+                    break
                 case '\n':
                     break
+                case ' ':
+                    if (text != '') {
+                        text += t
+                    } else {
+                        break
+                    }
                 case undefined:
-                    token = this.token['eof']
+                    if (this.pos >= this.string.length) {
+                        token = this.token['eof']
+                    }
+                    break
                 default:
                     text += t
                     token = this.handleTextTag(text)
@@ -62,9 +65,19 @@ class Lexer {
     }
 
     handleStartTag() {
-        let s = this.string.split(' ').filter((str) => {
-            return str != ''
-        })[0]
+        let idx = this.string.indexOf('>')
+        if (idx == -1) {
+            throw 'parse err! miss match '>''
+        }
+        let str = this.string.slice(this.pos, idx)
+        let s = ''
+        if (str.includes(' ')) {
+            s = this.string.split(' ').filter((str) => {
+                return str != ''
+            })[0]
+        } else {
+            s = this.string.split('>')[0]
+        }
         let type = s.slice(1)
         this.pos += type.length
         let props = this.handlePropTag()
@@ -76,7 +89,6 @@ class Lexer {
         this.advance()
         let idx = this.string.indexOf('>')
         let type = this.string.slice(this.pos, idx)
-        log('end tag', this.string, this.pos, idx, type)
         this.pos += type.length
         if (this.advance() != '>') {
             throw 'parse err! miss match '>''
@@ -85,30 +97,32 @@ class Lexer {
     }
 
     handlePropTag() {
-        this.advance()
+        // this.advance()
         let idx = this.string.indexOf('>')
         if (idx == -1) {
             throw 'parse err! miss match '>''
         }
         let string = this.string.slice(this.pos, idx)
-        let props = string.split(' ')
-        let pm = props.filter((props) => {
-            return props != ''
-        }).map((prop) => {
-            let kv = prop.split('=')
-            let o = {}
-            o[kv[0]] = kv[1]
-            return o
-        })
-        log('po ', this.pos)
-        this.pos += string.length
-        log('poa ', this.pos)
+        let pm = []
+        if (string != ' ')  {
+            let props = string.split(' ')
+            pm = props.filter((props) => {
+                return props != ''
+            }).map((prop) => {
+                let kv = prop.split('=')
+                let o = {}
+                o[kv[0]] = kv[1]
+                return o
+            })
+            this.pos += string.length
+        }
+        
         return pm
     }
 
     handleTextTag(text) {
         if (this.lookAhead() == '<') {
-            return [this.token['text'], text]
+            return [this.token['text'], text.trim()]
         } else {
             return ''
         }
@@ -118,7 +132,9 @@ class Lexer {
 function main() {
     let str = `<div name="{{ad}}"    class="fuck" id="1">
                     this is text
-                    <span name="asd"></span>
+                    <span name="asd">
+                        <p>fu ck</p>
+                    </span>
                 </div>`
     let lexer = new Lexer(str)
     log('lex', lexer.lex())
@@ -126,8 +142,11 @@ function main() {
     log('lex', lexer.lex())
     log('lex', lexer.lex())
     log('lex', lexer.lex())
+    log('lex', lexer.lex())
+    log('lex', lexer.lex())
+    log('lex', lexer.lex())
 }
 
-main()
+// main()
 
 module.exports = Lexer
