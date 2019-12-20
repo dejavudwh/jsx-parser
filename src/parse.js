@@ -14,6 +14,7 @@ class JsxParser {
         this.tokens = this.lexer.token
         this.tags = []
         this.jsx = {}
+        this.currentJsx = this.jsx
         this.setup()
     }
 
@@ -57,9 +58,10 @@ class JsxParser {
                     jsx = jsx.props['childrens']
                 }
             }
-            jsx.push(new Jsx(tag, {
+            this.currentJsx = new Jsx(tag, {
                 'childrens': []
-            }))
+            })
+            jsx.push(this.currentJsx)
         } else {
             jsx = new Jsx(tag, {
                 'childrens': []
@@ -79,7 +81,8 @@ class JsxParser {
     }
 
     parseText(tag) {
-        this.jsx['props']['text'] = tag
+        log('c jsx', this.currentJsx)
+        this.currentJsx['props']['text'] = tag
         this.parse()
     }
 
