@@ -1,17 +1,19 @@
 let Lexer = require('./lexer')
 let log = require('./utils')
 
+class Jsx {
+    constructor(type, props) {
+        this.type = type
+        this.props = props
+    }
+}
+
 class JsxParser {
     constructor(string) {
         this.lexer = new Lexer(string)
         this.tokens = this.lexer.token
         this.tags = []
-        this.jsx = {
-            'type': '',
-            'props': {
-                'childrens': ''
-            },
-        }
+        this.jsx = {}
         this.setup()
     }
 
@@ -45,12 +47,26 @@ class JsxParser {
     parseStart(tag, props) {
         let len = this.tags.length
         let jsx = this.jsx
-        if (len > 1) {
+        log(tag, len)
+        if (len >= 1) {
             for (let i = 0; i < len; i++) {
-                jsx = this.jsx['props']['childrens']
+                log('forrrrr', tag, jsx, i)
+                if (len >= 2 && i >= 1) {
+                    jsx = jsx[jsx.length - 1]['props']['childrens']
+                } else {
+                    jsx = jsx.props['childrens']
+                }
             }
+            jsx.push(new Jsx(tag, {
+                'childrens': []
+            }))
+        } else {
+            jsx = new Jsx(tag, {
+                'childrens': []
+            })
+            this.jsx = jsx
         }
-        log('start ', jsx)
+        log('start ', this.jsx)
         this.tags.push(tag)
         this.parse()
     }
@@ -74,14 +90,29 @@ class JsxParser {
     parseErr() {
         throw `parse err! syntax err `
     }
+
+    test() {
+        let jsx = this.jsx
+        jsx = jsx.props['children']=  new Jsx('asd', {})
+        jsx = jsx.props['children'] = new Jsx('asd', {})
+        jsx = jsx.props['children'] =  new Jsx('asd', {})
+        log(this.jsx)
+    }
 }
 
 let str = `<div name="{{ad}}"    class="fuck" id="1">
-                    this is text
-                    <span name="asd">
-                        <p>fu ck</p>
-                    </span>
-                </div>`
+                this is text
+                <span name="asd">
+                    <p>fu ck</p>
+                </span> 
+                <div>
+                    zxc
+                </div>  
+            </div>  
+            `
 
-new JsxParser(str).parse()
+let jp = new JsxParser(str)
+jp.parse()
+log(JSON.stringify(jp.jsx))
+// new JsxParser(str).test()
 
