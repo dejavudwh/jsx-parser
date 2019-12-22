@@ -1,5 +1,5 @@
-let JsxParser = require('./parse')
-let log = require('./utils')
+let JsxParser = require('../src/parse')
+let log = require('../src/utils')
 
 let str = `<div name="{{jsx-parse}}" class="{{fuck}}" id="1">
                 Life is too difficult

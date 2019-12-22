@@ -72,7 +72,7 @@ class Lexer {
     handleStartTag() {
         let idx = this.string.indexOf('>')
         if (idx == -1) {
-            throw 'parse err! miss match '>''
+            throw new Error('parse err! miss match '>'')
         }
         let str = this.string.slice(this.pos, idx)
         let s = ''
@@ -96,16 +96,15 @@ class Lexer {
         let type = this.string.slice(this.pos, idx)
         this.pos += type.length
         if (this.advance() != '>') {
-            throw 'parse err! miss match '>''
+            throw new Error('parse err! miss match '>'')
         }
         return [token.endTag, type, []]
     }
 
     handlePropTag() {
-        // this.advance()
         let idx = this.string.indexOf('>')
         if (idx == -1) {
-            throw 'parse err! miss match '>''
+            throw new Error('parse err! miss match '>'')
         }
         let string = this.string.slice(this.pos, idx)
         let pm = []
@@ -127,7 +126,6 @@ class Lexer {
 
     handleTextTag(text) {
         let t = text.trim()
-        log('lexer', text, this.lookAhead())
         if (this.lookAhead() == '<') {
             return [this.token['text'], t, []]
         } else {
@@ -143,7 +141,7 @@ class Lexer {
             return string.slice(1, last)
         }
 
-        throw `parse error! ${string} quotes miss matchs`
+        throw new Error(`parse error! ${string} quotes miss matchs`)
     }
 }
 

@@ -31,7 +31,6 @@ class JsxParser {
 
     parse() {
         this.currentToken = this.lexer.lex()
-        log('token ', this.currentToken)
         let type = this.currentToken[0]
         let tag = this.currentToken[1]
         let props = this.mergeObj(this.currentToken[2])
@@ -43,7 +42,7 @@ class JsxParser {
         }
 
         if (this.tags.length > 0) {
-            throw 'parse error! Mismatched start and end tags'
+            throw new Error('parse error! Mismatched start and end tags')
         }
 
         return this.jsx
@@ -84,7 +83,6 @@ class JsxParser {
     }
 
     parseText(tag) {
-        log('text', this.currentJsx, this.jsx)
         this.currentJsx['props']['text'] = tag
         this.parse()
     }
@@ -94,7 +92,7 @@ class JsxParser {
     }
 
     parseErr() {
-        throw `parse err! syntax err `
+        throw new Error(`parse err! syntax err `)
     }
 
     mergeObj(objs) {
